@@ -2,20 +2,19 @@
 # set
 set(SOURCE)
 set(OBJECT)
-set(BINARY nndeploy_demo_dag)
+set(BINARY nndeploy_demo_hello)
 set(DIRECTORY demo)
 set(DEPEND_LIBRARY)
 set(SYSTEM_LIBRARY)
 set(THIRD_PARTY_LIBRARY)
 
-message(STATUS "Building nndeploy demo")
 # include
 include_directories(${ROOT_PATH}/demo)
 
 # SOURCE
 file(GLOB_RECURSE SOURCE
-  "${ROOT_PATH}/demo/dag/*.h"
-  "${ROOT_PATH}/demo/dag/*.cc"
+  "${ROOT_PATH}/demo/hello/*.h"
+  "${ROOT_PATH}/demo/hello/*.cc"
 )
 file(GLOB DEMO_SOURCE
   "${ROOT_PATH}/demo/*.h"
@@ -25,7 +24,7 @@ set(SOURCE ${SOURCE} ${DEMO_SOURCE})
 # OBJECT
 # BINARY
 add_executable(${BINARY} ${SOURCE} ${SOURCE})
-set_target_properties(${BINARY} PROPERTIES LINK_FLAGS "-Wl")
+set_target_properties(${BINARY} PROPERTIES LINK_FLAGS "-Wl")#,--no-as-needed")
 # DIRECTORY
 set_property(TARGET ${BINARY} PROPERTY FOLDER ${DIRECTORY})
 # DEPEND_LIBRARY
@@ -39,8 +38,8 @@ list(APPEND SYSTEM_LIBRARY ${NNDEPLOY_DEMO_SYSTEM_LIBRARY})
 target_link_libraries(${BINARY} ${SYSTEM_LIBRARY})
 # THIRD_PARTY_LIBRARY
 list(APPEND THIRD_PARTY_LIBRARY ${NNDEPLOY_THIRD_PARTY_LIBRARY})
-list(APPEND THIRD_PARTY_LIBRARY ${NNDEPLOY_PLUGIN_THIRD_PARTY_LIBRARY})
 list(APPEND THIRD_PARTY_LIBRARY ${NNDEPLOY_DEMO_THIRD_PARTY_LIBRARY})
+list(APPEND THIRD_PARTY_LIBRARY ${NNDEPLOY_PLUGIN_THIRD_PARTY_LIBRARY})
 list(APPEND THIRD_PARTY_LIBRARY ${NNDEPLOY_PLUGIN_LIST})
 target_link_libraries(${BINARY} ${THIRD_PARTY_LIBRARY})
 # install

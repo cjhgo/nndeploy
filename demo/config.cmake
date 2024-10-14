@@ -52,6 +52,7 @@ endif()
 
 if(ENABLE_NNDEPLOY_PLUGIN_DETECT)
   include(${ROOT_PATH}/demo/detect/config.cmake)
+  include(${ROOT_PATH}/demo/hello/config.cmake)
 endif()
 
 if(ENABLE_NNDEPLOY_PLUGIN_SEGMENT)

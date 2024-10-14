@@ -16,6 +16,7 @@ include(cmake/util.cmake)
 include(cmake/summary.cmake)
 
 if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/config.cmake)
+  message(STATUS "will include ${CMAKE_CURRENT_BINARY_DIR}/config.cmake")
   include(${CMAKE_CURRENT_BINARY_DIR}/config.cmake)
 endif()
 
