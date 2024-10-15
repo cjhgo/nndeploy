@@ -97,6 +97,7 @@ nndeploy_option(ENABLE_NNDEPLOY_TEST "ENABLE_NNDEPLOY_TEST" OFF)
 
 # demo
 nndeploy_option(ENABLE_NNDEPLOY_DEMO "ENABLE_NNDEPLOY_DEMO" OFF)
+nndeploy_option(ENABLE_NNDEPLOY_MODELS "ENABLE_NNDEPLOY_MODELS" OFF)
 
 # python
 nndeploy_option(ENABLE_NNDEPLOY_PYTHON "ENABLE_NNDEPLOY_PYTHON" OFF)
@@ -648,6 +649,9 @@ if(ENABLE_NNDEPLOY_DEMO)
   include(${ROOT_PATH}/demo/config.cmake)
 endif()
 
+if(ENABLE_NNDEPLOY_MODELS)
+  include(${ROOT_PATH}/models/config.cmake)
+endif()
 # python
 if(ENABLE_NNDEPLOY_PYTHON)
   include(${ROOT_PATH}/python/config.cmake)
