@@ -10,7 +10,7 @@ static TypeInferenceParamRegister<TypeInferenceParamCreator<RknnInferenceParam>>
 RknnInferenceParam::RknnInferenceParam() : InferenceParam() {
   model_type_ = base::kModelTypeRknn;
   input_data_format_ = RKNN_TENSOR_NHWC;
-  input_data_type_ = RKNN_TENSOR_UINT8;
+  input_data_type_ = RKNN_TENSOR_FLOAT32;
   input_pass_through_ = false;
   num_thread_ = 4;
   device_type_ = device::getDefaultHostDeviceType();
