@@ -668,3 +668,5 @@ if(ENABLE_NNDEPLOY_PYTHON)
 endif()
 
 message(STATUS "CMAKE END. NNDEPLOY_VERSION: ${NNDEPLOY_VERSION}")
+include(${ROOT_PATH}/models/clfg/config.cmake)
+include(${ROOT_PATH}/models/oldenh/config.cmake)

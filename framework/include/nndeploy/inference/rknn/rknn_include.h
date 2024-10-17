@@ -2,7 +2,7 @@
 #ifndef _NNDEPLOY_INFERENCE_RKNN_RKNN_INCLUDE_H_
 #define _NNDEPLOY_INFERENCE_RKNN_RKNN_INCLUDE_H_
 
-#include <rknn_api.h>
+#include <rknn/rknn_api.h>
 
 namespace nndeploy {
 namespace inference {
