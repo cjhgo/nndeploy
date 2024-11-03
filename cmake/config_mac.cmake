@@ -13,6 +13,7 @@
 # $ make -j8
 # --------------------------------------------------------------------
 # common
+set(CMAKE_BUILD_TYPE Release CACHE STRING "")
 set(ENABLE_NNDEPLOY_BUILD_SHARED ON CACHE BOOL "") # 是否编译为动态库，默认ON
 set(ENABLE_NNDEPLOY_SYMBOL_HIDE ON CACHE BOOL "") # 符号表是否隐藏，默认为ON
 set(ENABLE_NNDEPLOY_CXX17_ABI ON CACHE BOOL "") # C++的版本，选择为C++17，默认为OFF

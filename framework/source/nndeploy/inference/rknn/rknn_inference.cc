@@ -86,7 +86,7 @@ base::Status RknnInference::init() {
 
     input.index = i;
     input.type = rknn_inference_param->input_data_type_;
-    input.size = input_attr.n_elems;
+    input.size = input_attr.n_elems * data_type.size();
     input.fmt = rknn_inference_param->input_data_format_;
     input.pass_through = rknn_inference_param->input_pass_through_;
   }
