@@ -16,7 +16,6 @@ set(RKSDK_HOME /root/workspace/rv1126_rv1109_sdk/buildroot/output/rockchip_rv112
 set(COMMON_PATH ${RKSDK_HOME}/host/arm-buildroot-linux-gnueabihf/sysroot/usr/include CACHE INTERNAL "")
 set(USR_PATH ${RKSDK_HOME}/host/arm-buildroot-linux-gnueabihf/sysroot/usr CACHE INTERNAL "")
 set(CMAKE_TOOLCHAIN_FILE "${RKSDK_HOME}/host/share/buildroot/toolchainfile.cmake" CACHE STRING "Toolchain file")
-
 message(STATUS "COMMON_PATH: ${COMMON_PATH}")
 
 message(STATUS "USR_PATH: ${USR_PATH}")
@@ -50,6 +49,7 @@ set(ENABLE_NNDEPLOY_CXX17_ABI ON CACHE BOOL "") # C++的版本，选择为C++17�
 set(ENABLE_NNDEPLOY_OPENMP ON CACHE BOOL "") # 否使用OpenMP，该选项在Mac/iOS平台无效，默认为ON
 set(ENABLE_NNDEPLOY_TIME_PROFILER ON CACHE BOOL "") # 时间性能Profile，默认为ON
 set(ENABLE_NNDEPLOY_OPENCV ON CACHE BOOL "") # 是否链接第三方库opencv，默认为OFF
+# set(OpenCV_DIR /root/workspace/opencv_build/opencv-4.10.0/build/install/lib/cmake/opencv4 CACHE STRING "")
 set(NNDEPLOY_OPENCV_LIBS) # 链接的具体的opencv库名称，例如opencv_world480，opencv_java4等
 
 # # base

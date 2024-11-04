@@ -3,13 +3,13 @@ include(ExternalProject)
 
 if (ENABLE_NNDEPLOY_OPENCV STREQUAL "OFF")
 elseif (ENABLE_NNDEPLOY_OPENCV STREQUAL "ON")
-  find_package(OpenCV REQUIRED)
+  find_package(OpenCV 4 REQUIRED)
   # If the package has been found, several variables will
   # be set, you can find the full list with descriptions
   # in the OpenCVConfig.cmake file.
   # Print some message showing some of them
   message(STATUS "OpenCV library status:")
-  message(STATUS "    config: ${OpenCV_DIR}") 
+  message(STATUS "    config: ${OpenCV_DIR}")
   message(STATUS "    version: ${OpenCV_VERSION}")
   message(STATUS "    libraries: ${OpenCV_LIBS}")
   message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
@@ -21,7 +21,7 @@ else()
   foreach(LIB ${NNDEPLOY_OPENCV_LIBS})
     set(LIB_NAME ${NNDEPLOY_LIB_PREFIX}${LIB}${NNDEPLOY_LIB_SUFFIX}${NNDEPLOY_OPENCV_VERSION})
     set(FULL_LIB_NAME ${LIB_PATH}/${LIB_NAME})
-    set(NNDEPLOY_THIRD_PARTY_LIBRARY ${NNDEPLOY_THIRD_PARTY_LIBRARY} ${FULL_LIB_NAME})    
+    set(NNDEPLOY_THIRD_PARTY_LIBRARY ${NNDEPLOY_THIRD_PARTY_LIBRARY} ${FULL_LIB_NAME})
   endforeach()
   file(GLOB_RECURSE INSTALL_LIBS "${LIB_PATH}/*")
   foreach(INSTALL_LIB ${INSTALL_LIBS})
