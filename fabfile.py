@@ -37,7 +37,30 @@ def lbuild():
 
 
 @hosts(build_ssh)
-def rbuild():
+def m1build():
+    """build  on pdev"""
+    s2pdev()
+    with cd(sync_dir):
+        cmake_cmd=f"cmake -B build -C cmake/config_rkm1.cmake ."
+        run(cmake_cmd)
+        run('make -j -C build  VERBOSE=TRUE')
+        run('make install -j -C build  VERBOSE=TRUE')
+    s2m1()
+
+@hosts(build_ssh)
+def babuild():
+    """build  on pdev"""
+    s2pdev()
+    with cd(sync_dir):
+        cmake_cmd=f"cmake -B build -C cmake/config_rkba.cmake ."
+        run(cmake_cmd)
+        run('make -j -C build  VERBOSE=TRUE')
+        run('make install -j -C build  VERBOSE=TRUE')
+    s2m1()
+
+
+@hosts(build_ssh)
+def akbuild():
     """build  on pdev"""
     s2pdev()
     with cd(sync_dir):
