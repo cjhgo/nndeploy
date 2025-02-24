@@ -8,6 +8,22 @@
 namespace nndeploy {
 namespace inference {
 
+void dump_tensor_attr(rknn_tensor_attr *attr) {
+  char dims_str[100];
+  memset(dims_str, 0, sizeof(dims_str));
+  for (int i = 0; i < attr->n_dims; i++) {
+    sprintf(dims_str, "%s%d,", dims_str, attr->dims[i]);
+  }
+
+  printf("  index=%d, name=%s, n_dims=%d, dims=[%s], n_elems=%d, size=%d, "
+         "w_stride=%d, size_with_stride=%d, fmt=%s, type=%s, qnt_type=%s, "
+         "zp=%d, scale=%f\n",
+         attr->index, attr->name, attr->n_dims, dims_str, attr->n_elems,
+         attr->size, attr->w_stride, attr->size_with_stride,
+         get_format_string(attr->fmt), get_type_string(attr->type),
+         get_qnt_type_string(attr->qnt_type), attr->zp, attr->scale);
+}
+
 TypeInferenceRegister<TypeInferenceCreator<RknnInference>>
     g_rknn_inference_register(base::kInferenceTypeRknn);
 
@@ -16,10 +32,12 @@ RknnInference::RknnInference(base::InferenceType type) : Inference(type) {}
 RknnInference::~RknnInference() {}
 
 base::Status RknnInference::init() {
+
   base::Status status = base::kStatusCodeOk;
   std::string model_buffer;
   RknnInferenceParam *rknn_inference_param =
       dynamic_cast<RknnInferenceParam *>(inference_param_);
+  std::cout << "will load from file" << rknn_inference_param->model_value_[0] << std::endl;
   if (rknn_inference_param->is_path_) {
     model_buffer = base::openFile(rknn_inference_param->model_value_[0]);
   } else {
@@ -46,6 +64,10 @@ base::Status RknnInference::init() {
     return base::kStatusCodeErrorInferenceRknn;
   }
 #endif
+  rknn_sdk_version version;
+  auto ret = rknn_query(rknn_ctx_, RKNN_QUERY_SDK_VERSION, &version, sizeof(rknn_sdk_version));
+  std::cout << "RKNN SDK version: " << version.api_version << std::endl;
+  std::cout << "RKNN SDK version: " << version.drv_version << std::endl;
   rknn_input_output_num io_num;
   if (!CHECK_RKNN(rknn_query(rknn_ctx_, RKNN_QUERY_IN_OUT_NUM, &io_num,
                              sizeof(io_num)))) {
@@ -63,6 +85,7 @@ base::Status RknnInference::init() {
                                sizeof(input_attr)))) {
       return base::kStatusCodeErrorInferenceRknn;
     };
+    dump_tensor_attr(&input_attr);
     auto name = std::string(input_attr.name);
     std::cout << name << std::endl;
     base::IntVector shape = RknnConvert::convertToShape(
@@ -76,6 +99,7 @@ base::Status RknnInference::init() {
     desc.shape_ = shape;
     desc.data_type_ = data_type;
     desc.data_format_ = data_format;
+    desc.print();
 
     // create empty buffer tensor for input, use setInputTensor to set buffer
     // later. avoid unnecessray memory copy
@@ -87,6 +111,8 @@ base::Status RknnInference::init() {
     input.index = i;
     input.type = rknn_inference_param->input_data_type_;
     input.size = input_attr.n_elems * data_type.size();
+    std::cout << "input.size: " << input.size << std::endl;
+    std::cout << "data type size: " << data_type.size() << std::endl;
     input.fmt = rknn_inference_param->input_data_format_;
     input.pass_through = rknn_inference_param->input_pass_through_;
   }
@@ -98,22 +124,23 @@ base::Status RknnInference::init() {
                                sizeof(output_attr)))) {
       return base::kStatusCodeErrorInferenceRknn;
     };
+    dump_tensor_attr(&output_attr);
     auto name = std::string(output_attr.name);
     std::cout << name << std::endl;
     base::IntVector shape = RknnConvert::convertToShape(output_attr);
 
     device::TensorDesc desc;
     desc.shape_ = shape;
-    desc.data_type_ = base::DataType(base::kDataTypeCodeFp, 32, 1);
+    desc.data_type_ = RknnConvert::convertToDataType(rknn_inference_param->output_data_types_[i]);
     desc.data_format_ = RknnConvert::convertToDataFormat(output_attr.fmt);
 
     device::Tensor *output_tensor = new device::Tensor(device, desc, name);
     output_tensors_.insert({name, output_tensor});
 
     output.index = i;
-    output.want_float = true;
+    output.want_float = (desc.data_type_ ==  base::dataTypeOf<float>());
     output.is_prealloc = true;
-    output.size = output_attr.n_elems * sizeof(float);
+    output.size = output_attr.n_elems * desc.data_type_.size();
     output.buf = output_tensor->getData();
   }
   return status;
@@ -157,6 +184,8 @@ base::Status RknnInference::setInputTensor(const std::string &name,
 
   if (input_tensors_.count(name) > 0) {
     NNDEPLOY_ASSERT(input_tensor->getDesc() == input_tensors_[name]->getDesc());
+input_tensor->getDesc().print();
+input_tensors_[name]->getDesc().print();
     input_tensors_[name]->justModify(input_tensor->getBuffer());
   } else {
     NNDEPLOY_LOGI("input_tensor nama: %s not exist!\n", name.c_str());

@@ -13,7 +13,12 @@
 # $ make -j8
 # --------------------------------------------------------------------
 
+set(CXX_BASE /home/linaro/project/babu//gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin)
+set(CMAKE_C_COMPILER ${CXX_BASE}/aarch64-none-linux-gnu-gcc CACHE STRING "")
+set(CMAKE_CXX_COMPILER ${CXX_BASE}/aarch64-none-linux-gnu-g++ CACHE STRING "")
+set(CMAKE_SYSTEM_PROCESSOR aarch64 CACHE STRING "")
 
+set(OpenCV_DIR /home/linaro/project/model-deploy/rknn_model_zoo/3rdparty/opencv/opencv-linux-aarch64/share/OpenCV CACHE STRING "")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -D_DEBUG" CACHE STRING "")
 set(CMAKE_COLOR_MAKEFILE ON CACHE BOOL "")
@@ -69,18 +74,18 @@ set(ENABLE_NNDEPLOY_DEMO ON CACHE BOOL "") # 是否使能可执行程序demo，�
 
 # plugin
 # # preprocess
-set(ENABLE_NNDEPLOY_PLUGIN_PREPROCESS ON CACHE BOOL "") # 是否编译plugin目录中文件，默认为ON
+set(ENABLE_NNDEPLOY_PLUGIN_PREPROCESS OFF CACHE BOOL "") # 是否编译plugin目录中文件，默认为ON
 
 # # infer
 set(ENABLE_NNDEPLOY_PLUGIN_INFER ON CACHE BOOL "") # 是否编译plugin目录中文件，默认为ON
 
 # # codec
-set(ENABLE_NNDEPLOY_PLUGIN_CODEC ON CACHE BOOL "") # 是否编译plugin目录中文件，默认为ON
+set(ENABLE_NNDEPLOY_PLUGIN_CODEC OFF CACHE BOOL "") # 是否编译plugin目录中文件，默认为ON
 
 # # detect
-set(ENABLE_NNDEPLOY_PLUGIN_DETECT ON CACHE BOOL "")
-set(ENABLE_NNDEPLOY_PLUGIN_DETECT_DETR ON CACHE BOOL "")
-set(ENABLE_NNDEPLOY_PLUGIN_DETECT_YOLO ON CACHE BOOL "")
+set(ENABLE_NNDEPLOY_PLUGIN_DETECT OFF CACHE BOOL "")
+set(ENABLE_NNDEPLOY_PLUGIN_DETECT_DETR OFF CACHE BOOL "")
+set(ENABLE_NNDEPLOY_PLUGIN_DETECT_YOLO OFF CACHE BOOL "")
 
 
 message(STATUS "demo config is ${ENABLE_NNDEPLOY_DEMO}")

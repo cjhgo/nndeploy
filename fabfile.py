@@ -13,7 +13,7 @@ home = os.getenv('HOME')
 rel_home = os.path.relpath(repopath, os.path.expanduser('~'))
 print(home, repopath, stem)
 
-build_ssh="m1sd"
+build_ssh="rkcve"
 run_ssh="m1"
 
 # sync_dir="/tmp/cppinferlib"
@@ -28,6 +28,14 @@ def s2m1():
     cmd=f"rsync -avzk {build_ssh}:{sync_dir}/build/install/lib /tmp"
     local(cmd)
     cmd=f"rsync -av /tmp/lib {run_ssh}:/tmp"
+    local(cmd)
+
+def s2w8():
+    cmd=f"rsync -avzk {build_ssh}:{sync_dir}/build/install /tmp"
+    local(cmd)
+    cmd=f"sshpass -p 'Mdkj@2022' ssh w8 'rm -rf /tmp/run; mkdir /tmp/run'"
+    local(cmd)
+    cmd=f"sshpass -p 'Mdkj@2022' scp -r /tmp/install w8:/tmp/run"
     local(cmd)
 
 def lbuild():
@@ -56,7 +64,7 @@ def babuild():
         run(cmake_cmd)
         run('make -j -C build  VERBOSE=TRUE')
         run('make install -j -C build  VERBOSE=TRUE')
-    s2m1()
+    s2w8()
 
 
 @hosts(build_ssh)
