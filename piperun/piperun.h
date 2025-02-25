@@ -10,5 +10,7 @@ struct YoloCtx{
   nndeploy::device::Tensor input_tensor;
   std::vector<std::unique_ptr<nndeploy::device::Tensor>> output_tensors;
   std::vector<pipeline::yolo_utils::YoloBox> boxes;
+  int nc = 80;
+  int nkpts = 17;
 };
 

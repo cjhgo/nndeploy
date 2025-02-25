@@ -3,8 +3,8 @@
 namespace pipeline::yolo_utils {
 
 void non_max_suppression(std::vector<YoloBox> *out,
-                         nndeploy::device::Tensor *tensor_prediction,
-                         int nc, float conf_thres, float iou_thres,
+                         nndeploy::device::Tensor *tensor_prediction, int nc,
+                         float conf_thres, float iou_thres,
                          const std::vector<int> &classes, int max_det) {
   auto hh = tensor_prediction->getShapeIndex(1);
   auto ww = tensor_prediction->getShapeIndex(2);
@@ -85,11 +85,9 @@ struct CutBox {
 float sigmod(float x) { return 1 / (1 + std::exp(-x)); }
 
 void cut_non_max_suppression(std::vector<YoloBox> *out,
-            nndeploy::device::Tensor* tensor_prediction,
-                             int nc,
-                             float conf_thres, float iou_thres,
+                             nndeploy::device::Tensor *tensor_prediction,
+                             int nc, float conf_thres, float iou_thres,
                              const std::vector<int> &classes, int max_det) {
-
   auto hh = tensor_prediction->getShapeIndex(1);
   auto ww = tensor_prediction->getShapeIndex(2);
   cv::Mat prediction(hh, ww, CV_32FC1, tensor_prediction->getData());
@@ -101,8 +99,8 @@ void cut_non_max_suppression(std::vector<YoloBox> *out,
     double max_val;
     cv::Point max_loc;
     cv::minMaxLoc(conf_row, nullptr, &max_val, nullptr, &max_loc);
-    if (max_val > -12) {
-      std::cout << j << " " << max_val << std::endl;
+    if (max_val > -1) {
+      // std::cout << j << " " << max_val << std::endl;
       auto [cur_h, cur_w, stride] = process_index(j);
       auto conf = static_cast<float>(max_val);
       auto cls_id = max_loc.y;
@@ -110,7 +108,7 @@ void cut_non_max_suppression(std::vector<YoloBox> *out,
       cut_result->push_back({j, cur_h, cur_w, stride, conf, cls_id, box64});
     }
   }
-  std::cout << "cut_result size is " << cut_result->size() << std::endl;
+  // std::cout << "cut_result size is " << cut_result->size() << std::endl;
   std::vector<cv::Rect2d> boxes;
   std::vector<float> scores;
 
@@ -162,5 +160,32 @@ void cut_non_max_suppression(std::vector<YoloBox> *out,
                                   cut_box.stride,
                                   cut_box.index};
                  });
+}
+
+std::vector<cv::Mat> draw_yolobox(cv::Mat input,
+                                  std::vector<YoloBox> &results) {
+  std::vector<cv::Mat> ret;
+  cv::Mat empty;
+  cv::resize(input, empty, cv::Size(640, 640));
+  for (int index = 0; index < results.size(); ++index) {
+    auto &box = results[index];
+    cv::Mat cur = empty.clone();
+    if(!box.mask.empty() && box.mask.rows == 640) {
+      cv::Mat mask = box.mask;
+      cur.setTo(0, mask < 0.5);
+    }
+    auto &kpts = box.kpts;
+    for (int index = 0; index < kpts.size(); ++index) {
+      auto [x, y, score] = kpts[index];
+      if (score > 0.2) {
+        int xi(x), yi(y);
+        cv::circle(cur, cv::Point(xi, yi), 5, cv::Scalar(0, 0, 255), -1);
+      }
+    }
+    cv::rectangle(cur, box.rect, cv::Scalar(0, 255, 0), 2);
+    cv::imwrite("/tmp/output_"+std::to_string(index)+".jpg", cur);
+    ret.push_back(cur);
+  }
+  return ret;
 }
 }  // namespace pipeline::yolo_utils

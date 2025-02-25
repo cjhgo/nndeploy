@@ -30,4 +30,9 @@ void  cut_non_max_suppression(std::vector<YoloBox>* out, nndeploy::device::Tenso
                                          float iou_thres = 0.7,
                                          const std::vector<int> &classes = {},
                                          int max_det = 300 );
+
+
+std::vector<cv::Mat>
+draw_yolobox(cv::Mat input, std::vector<YoloBox>& results);
+
 }
