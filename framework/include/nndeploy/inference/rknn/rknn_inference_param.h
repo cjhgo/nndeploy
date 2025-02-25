@@ -28,8 +28,11 @@ class RknnInferenceParam : public InferenceParam {
   rknn_tensor_format input_data_format_;
   rknn_tensor_type input_data_type_;
   std::vector<rknn_tensor_type> output_data_types_ = {RKNN_TENSOR_FLOAT32};
-  std::vector<int32_t> zero_points_ = {0};
-  std::vector<float> scales_ = {1.0};
+  std::vector<int32_t> input_zero_points_ = {0};
+  std::vector<float> input_scales_ = {1.0};
+
+  std::vector<int32_t> output_zero_points_ = {0};
+  std::vector<float> output_scales_ = {1.0};
   bool input_pass_through_;
 };
 

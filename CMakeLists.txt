@@ -667,6 +667,7 @@ if(ENABLE_NNDEPLOY_PYTHON)
   include(${ROOT_PATH}/python/config.cmake)
 endif()
 
+add_compile_options(${CURPLATFORM_DEFINITIONS})
 message(STATUS "CMAKE END. NNDEPLOY_VERSION: ${NNDEPLOY_VERSION}")
 include(${ROOT_PATH}/piperun/config.cmake)
 # include(${ROOT_PATH}/models/clfg/config.cmake)

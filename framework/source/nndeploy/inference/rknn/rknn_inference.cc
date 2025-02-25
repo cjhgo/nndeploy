@@ -76,6 +76,11 @@ base::Status RknnInference::init() {
 
   rknn_inputs_.resize(io_num.n_input);
   rknn_outputs_.resize(io_num.n_output);
+  rknn_inference_param->input_zero_points_.resize(io_num.n_input);
+  rknn_inference_param->input_scales_.resize(io_num.n_input);
+  rknn_inference_param->output_zero_points_.resize(io_num.n_output);
+  rknn_inference_param->output_scales_.resize(io_num.n_output);
+
   device::Device *device = device::getDevice(inference_param_->device_type_);
   for (int i = 0; i < io_num.n_input; ++i) {
     rknn_input &input = rknn_inputs_[i];
@@ -86,6 +91,9 @@ base::Status RknnInference::init() {
       return base::kStatusCodeErrorInferenceRknn;
     };
     dump_tensor_attr(&input_attr);
+    rknn_inference_param->input_zero_points_[i] = input_attr.zp;
+    rknn_inference_param->input_scales_[i] = input_attr.scale;
+
     auto name = std::string(input_attr.name);
     std::cout << name << std::endl;
     base::IntVector shape = RknnConvert::convertToShape(
@@ -125,6 +133,8 @@ base::Status RknnInference::init() {
       return base::kStatusCodeErrorInferenceRknn;
     };
     dump_tensor_attr(&output_attr);
+    rknn_inference_param->output_zero_points_[i] = output_attr.zp;
+    rknn_inference_param->output_scales_[i] = output_attr.scale;
     auto name = std::string(output_attr.name);
     std::cout << name << std::endl;
     base::IntVector shape = RknnConvert::convertToShape(output_attr);
