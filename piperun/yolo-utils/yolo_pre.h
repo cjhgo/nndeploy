@@ -1,7 +1,8 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 
-#include "piperun.h"
+#include "nntaskflow/nndep.h"
+#include "nntaskflow/platform.inl"
 
 namespace pipeline::yolo_utils {
 
