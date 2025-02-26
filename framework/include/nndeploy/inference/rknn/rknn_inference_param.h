@@ -25,15 +25,19 @@ class RknnInferenceParam : public InferenceParam {
 
   virtual base::Status get(const std::string &key, base::Value &value);
 
+  //read from
   rknn_tensor_format input_data_format_;
   rknn_tensor_type input_data_type_;
-  std::vector<rknn_tensor_type> output_data_types_ = {RKNN_TENSOR_FLOAT32};
+  //fill by user when need non-fp32 output
+  std::vector<rknn_tensor_type> output_data_types_;
+  bool input_pass_through_;
+
+  //write to
   std::vector<int32_t> input_zero_points_ = {0};
   std::vector<float> input_scales_ = {1.0};
 
   std::vector<int32_t> output_zero_points_ = {0};
   std::vector<float> output_scales_ = {1.0};
-  bool input_pass_through_;
 };
 
 }  // namespace inference

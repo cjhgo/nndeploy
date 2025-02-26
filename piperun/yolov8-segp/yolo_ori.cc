@@ -11,7 +11,7 @@ void yolo_det_post(YoloCtx& ctx){
 cv::Mat crop_seg_byproto(YoloBox& box, cv::Mat proto){
     cv::Mat mask = box.mask;
     std::cout << mask.size();
-    
+
     cv::Mat mask_mul = mask * proto;
     cv::Mat mask_160(160, 160, CV_32FC1, mask_mul.data);
     cv::Mat mask_640;

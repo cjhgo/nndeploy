@@ -1,6 +1,75 @@
 #include "yolo_nms.h"
-
+#include <algorithm>
 namespace pipeline::yolo_utils {
+
+void _NMSBoxes(const std::vector<cv::Rect2d>& boxes,
+              const std::vector<float>& scores,
+              float score_threshold,
+              float iou_threshold,
+              std::vector<int>& indices)
+{
+    indices.clear();
+
+    // 1. 过滤低分框
+    std::vector<int> filtered_indices;
+    for (size_t i = 0; i < scores.size(); ++i) {
+        if (scores[i] >= score_threshold) {
+            filtered_indices.push_back(static_cast<int>(i));
+        }
+    }
+
+    if (filtered_indices.empty()) return;
+
+    // 2. 按分数降序排序
+    std::sort(filtered_indices.begin(), filtered_indices.end(),
+        [&scores](int a, int b) { return scores[a] > scores[b]; });
+
+    // 3. 预计算面积提升性能
+    std::vector<double> areas;
+    areas.reserve(filtered_indices.size());
+    for (int idx : filtered_indices) {
+        const auto& rect = boxes[idx];
+        areas.push_back(rect.width * rect.height);
+    }
+
+    // 4. NMS核心逻辑
+    std::vector<bool> suppressed(filtered_indices.size(), false);
+    for (size_t i = 0; i < filtered_indices.size(); ++i) {
+        if (suppressed[i]) continue;
+
+        int idx_i = filtered_indices[i];
+        indices.push_back(idx_i);
+
+        const auto& ib = boxes[idx_i];
+        const double area_i = areas[i];
+
+        for (size_t j = i + 1; j < filtered_indices.size(); ++j) {
+            if (suppressed[j]) continue;
+
+            const auto& jb = boxes[filtered_indices[j]];
+            const double area_j = areas[j];
+
+            // 计算交叠区域
+            const double xx1 = std::max(ib.x, jb.x);
+            const double yy1 = std::max(ib.y, jb.y);
+            const double xx2 = std::min(ib.x + ib.width, jb.x + jb.width);
+            const double yy2 = std::min(ib.y + ib.height, jb.y + jb.height);
+
+            const double w = std::max(0.0, xx2 - xx1);
+            const double h = std::max(0.0, yy2 - yy1);
+            const double intersection = w * h;
+
+            // 计算IoU
+            const double union_area = area_i + area_j - intersection;
+            const double iou = union_area > 0 ? (intersection / union_area) : 0;
+
+            if (iou > iou_threshold) {
+                suppressed[j] = true;
+            }
+        }
+    }
+}
+
 
 void non_max_suppression(std::vector<YoloBox> *out,
                          nndeploy::device::Tensor *tensor_prediction, int nc,
@@ -44,7 +113,8 @@ void non_max_suppression(std::vector<YoloBox> *out,
   }
 
   std::vector<int> indices;
-  cv::dnn::NMSBoxes(boxes, scores, 0.0, iou_thres, indices);
+  // cv::dnn::NMSBoxes(boxes, scores, 0.0, iou_thres, indices);
+  _NMSBoxes(boxes, scores, 0.0, iou_thres, indices);
 
   std::transform(indices.begin(), indices.end(), std::back_inserter(*out),
                  [&ret](int idx) { return ret[idx]; });
@@ -145,7 +215,8 @@ void cut_non_max_suppression(std::vector<YoloBox> *out,
   }
 
   std::vector<int> indices;
-  cv::dnn::NMSBoxes(boxes, scores, 0.0, iou_thres, indices);
+  // cv::dnn::NMSBoxes(boxes, scores, 0.0, iou_thres, indices);
+  _NMSBoxes(boxes, scores, 0.0, iou_thres, indices);
   std::transform(indices.begin(), indices.end(), std::back_inserter(*out),
                  [&cut_result](int idx) {
                    auto &cut_box = (*cut_result)[idx];

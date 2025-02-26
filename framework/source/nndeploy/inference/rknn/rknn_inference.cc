@@ -141,7 +141,12 @@ base::Status RknnInference::init() {
 
     device::TensorDesc desc;
     desc.shape_ = shape;
-    desc.data_type_ = RknnConvert::convertToDataType(rknn_inference_param->output_data_types_[i]);
+    if (rknn_inference_param->output_data_types_.size() > i) {
+      desc.data_type_ =
+          RknnConvert::convertToDataType(rknn_inference_param->output_data_types_[i]);
+    } else {
+      desc.data_type_ = base::dataTypeOf<float>();
+    }
     desc.data_format_ = RknnConvert::convertToDataFormat(output_attr.fmt);
 
     device::Tensor *output_tensor = new device::Tensor(device, desc, name);
@@ -194,8 +199,8 @@ base::Status RknnInference::setInputTensor(const std::string &name,
 
   if (input_tensors_.count(name) > 0) {
     NNDEPLOY_ASSERT(input_tensor->getDesc() == input_tensors_[name]->getDesc());
-input_tensor->getDesc().print();
-input_tensors_[name]->getDesc().print();
+// input_tensor->getDesc().print();
+// input_tensors_[name]->getDesc().print();
     input_tensors_[name]->justModify(input_tensor->getBuffer());
   } else {
     NNDEPLOY_LOGI("input_tensor nama: %s not exist!\n", name.c_str());

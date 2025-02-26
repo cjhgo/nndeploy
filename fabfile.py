@@ -33,15 +33,16 @@ def s2m1():
 def s2w8():
     cmd=f"rsync -avzk {build_ssh}:{sync_dir}/build/install /tmp"
     local(cmd)
-    cmd=f"sshpass -p 'Mdkj@2022' ssh w8 'rm -rf /tmp/run; mkdir /tmp/run'"
+    # cmd=f"sshpass -p 'Mdkj@2022' ssh w8 'rm -rf /tmp/run; mkdir /tmp/run'"
+    cmd=f"sshpass -p 'Mdkj@2022' scp /tmp/install/yolo w8:/tmp"
     local(cmd)
-    cmd=f"sshpass -p 'Mdkj@2022' scp -r /tmp/install w8:/tmp/run"
+    cmd=f"sshpass -p 'Mdkj@2022' scp -r /tmp/install/lib/lib*  w8:/usr/lib"
     local(cmd)
 
 def lbuild():
     """build  on local"""
     local('cmake -B build -C cmake/config_mac.cmake .')
-    local('make -j -C build VERBOSE=TRUE')
+    local('make -j12 -C build VERBOSE=TRUE')
 
 
 @hosts(build_ssh)

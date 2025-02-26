@@ -2,28 +2,33 @@
 #include "segp_post.h"
 #include "yolo_ori.cc"
 #include "yolo_cut.cc"
+#if __linux__ && __aarch64__
+#include "yolo_rkquan.cc"
+#endif
 #include <opencv2/opencv.hpp>
 #include <map>
 #include <functional>
+
 
 using namespace pipeline;
 
 // 修改点1：在配置结构体中添加 nkpts 字段
 struct TaskConfig {
     std::string infer_name;
-    std::function<void(YoloCtx&)> post_func;
+    std::function<void(YoloCtx&)> post_func = nullptr;
     int nc;
     int nkpts;
+    std::function<void(nndeploy::base::Param*)> custom = segp_post::rk_custom;
 };
 
 void generic_run(YoloCtx& ctx, const TaskConfig& config) {
     tf::Executor executor;
     tf::Taskflow taskflow("segp");
-    ctx.infer = pipeline::create_inference(config.infer_name);
+    ctx.infer = pipeline::create_inference(config.infer_name, config.custom);
     ctx.nc = config.nc;
     ctx.nkpts = config.nkpts;  // 新增关键点配置注入
 
-    create_nn_pipe<YoloCtx>(taskflow, ctx, 
+    create_nn_pipe<YoloCtx>(taskflow, ctx,
                           yolo_utils::yolo_pre_process<YoloCtx>,
                           config.post_func);
     executor.run(taskflow).get();
@@ -41,6 +46,8 @@ std::map<std::string, TaskConfig> TASK_MAP = {
     {"cut_seg",  {"segp_cut", segp_post::yolo_cut_seg_post,  1,  0}},
     {"cut_pose",  {"segp_cut", segp_post::yolo_cut_pose_post,  1,  17}},
     {"cut_segp",  {"segp_cut", segp_post::yolo_cut_segp_post,  1,  17}},
+
+    {"quan_segp",  {"segp_quan", segp_post::yolo_quan8_segp_post,  1,  17, segp_post::quanrk_custom}}
 };
 
 int main(int argc, char** argv) {
@@ -61,7 +68,7 @@ int main(int argc, char** argv) {
         YoloCtx ctx;
         ctx.input = img;
         generic_run(ctx, it->second);
-    } 
+    }
     else {
         std::cerr << "Invalid task type: " << task_type << std::endl;
         return 1;

@@ -6,11 +6,10 @@ void rawin_pre(cv::Mat input, nndeploy::device::Tensor* input_tensor) {
   cv::cvtColor(matin, matin, cv::COLOR_BGR2RGB);
   nndeploy::device::Device* device = nndeploy::device::getDefaultHostDevice();
   nndeploy::device::TensorDesc desc;
+  desc.data_type_ = nndeploy::base::dataTypeOf<uint8_t>();//!!
   desc.data_format_ = nndeploy::base::kDataFormatNHWC;
   desc.shape_ = {1, 640, 640, 3};
   input_tensor->create(device, desc, matin.data);
-  std::cout << "input tensor size: " << input_tensor->getShape().size()
-            << std::endl;
 }
 
 void norm_pre(cv::Mat input, nndeploy::device::Tensor* input_tensor) {
